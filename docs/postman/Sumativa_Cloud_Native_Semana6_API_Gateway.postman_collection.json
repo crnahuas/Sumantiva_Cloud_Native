@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Sumativa Cloud Native - Semana 6 EC2",
-    "description": "Coleccion ordenada para probar el flujo completo desplegado en EC2: EFS, S3, descarga con permiso, errores esperados y eliminacion.",
+    "name": "Sumativa Cloud Native - Semana 6 API Gateway",
+    "description": "Coleccion ordenada para probar el flujo completo por API Gateway: EFS, S3, descarga con permiso, errores esperados y eliminacion.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -10,11 +10,20 @@
       "script": {
         "type": "text/javascript",
         "exec": [
-          "if (!pm.environment.get('baseUrl')) pm.environment.set('baseUrl', 'https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com');",
-          "if (!pm.environment.get('fecha')) pm.environment.set('fecha', '202606');",
-          "if (!pm.environment.get('transportista')) pm.environment.set('transportista', 'transportistaX');",
-          "if (!pm.environment.get('credencialDescarga')) pm.environment.set('credencialDescarga', 'clave123');",
-          "if (!pm.environment.get('credencialIncorrecta')) pm.environment.set('credencialIncorrecta', 'clave-incorrecta');"
+          "const defaults = {",
+          "  baseUrl: 'https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com',",
+          "  fecha: '202606',",
+          "  transportista: 'transportistaX',",
+          "  credencialDescarga: 'clave123',",
+          "  credencialIncorrecta: 'clave-incorrecta'",
+          "};",
+          "Object.keys(defaults).forEach(function (key) {",
+          "  const value = pm.environment.get(key);",
+          "  if (!value || String(value).trim() === '') {",
+          "    pm.environment.set(key, defaults[key]);",
+          "  }",
+          "  pm.collectionVariables.set(key, pm.environment.get(key) || defaults[key]);",
+          "});"
         ]
       }
     }
@@ -24,12 +33,12 @@
       "name": "00 - Preparacion",
       "item": [
         {
-          "name": "00.1 API responde en EC2",
+          "name": "00.1 API responde por API Gateway",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/guias?transportista={{transportista}}&fecha={{fecha}}",
+              "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=202606",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -40,11 +49,11 @@
               "query": [
                 {
                   "key": "transportista",
-                  "value": "{{transportista}}"
+                  "value": "transportistaX"
                 },
                 {
                   "key": "fecha",
-                  "value": "{{fecha}}"
+                  "value": "202606"
                 }
               ]
             },
@@ -89,10 +98,10 @@
                 "guias"
               ]
             },
-            "description": "Crea la guia y guarda idGuia para las siguientes solicitudes. En EC2 debe aparecer bajo /mnt/efs/{{fecha}}/{{transportista}}/.",
+            "description": "Crea la guia y guarda idGuia para las siguientes solicitudes. En la EC2 debe aparecer bajo /mnt/efs/202606/transportistaX/.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transportista\": \"{{transportista}}\",\n  \"credencialDescarga\": \"{{credencialDescarga}}\",\n  \"fecha\": \"{{fecha}}\",\n  \"contenido\": \"Pedido 1001, destino Santiago, bultos 3. Evidencia de creacion temporal en EFS.\"\n}"
+              "raw": "{\n  \"transportista\": \"transportistaX\",\n  \"credencialDescarga\": \"clave123\",\n  \"fecha\": \"202606\",\n  \"contenido\": \"Pedido 1001, destino Santiago, bultos 3. Evidencia de creacion temporal en EFS.\"\n}"
             }
           },
           "response": [],
@@ -106,7 +115,7 @@
                   "const json = pm.response.json();",
                   "pm.test('Guia creada', function () { pm.expect(json.estado).to.eql('CREADA'); });",
                   "pm.test('Guarda idGuia', function () { pm.expect(json.idGuia).to.exist; pm.environment.set('idGuia', json.idGuia); });",
-                  "pm.test('Archivo temporal registrado', function () { pm.expect(json.efsPath).to.include(pm.environment.get('fecha')); pm.expect(json.tamanioBytes).to.be.above(0); });"
+                  "pm.test('Archivo temporal registrado', function () { pm.expect(json.efsPath).to.include('202606'); pm.expect(json.tamanioBytes).to.be.above(0); });"
                 ]
               }
             }
@@ -140,7 +149,7 @@
                 "exec": [
                   "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "const expectedKey = pm.environment.get('fecha') + '/' + pm.environment.get('transportista') + '/guia' + pm.environment.get('idGuia') + '.pdf';",
+                  "const expectedKey = '202606' + '/' + 'transportistaX' + '/guia' + pm.environment.get('idGuia') + '.pdf';",
                   "pm.test('Estado SUBIDA_S3', function () { pm.expect(json.estado).to.eql('SUBIDA_S3'); });",
                   "pm.test('S3 key esperada', function () { pm.expect(json.s3Key).to.eql(expectedKey); pm.environment.set('s3Key', json.s3Key); });"
                 ]
@@ -173,7 +182,7 @@
             "description": "Evidencia de validacion de permisos: una credencial incorrecta no puede descargar.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"credencialDescarga\": \"{{credencialIncorrecta}}\"\n}"
+              "raw": "{\n  \"credencialDescarga\": \"clave-incorrecta\"\n}"
             }
           },
           "response": [],
@@ -215,7 +224,7 @@
             "description": "Usa Send and Download en Postman para guardar el PDF como evidencia.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"credencialDescarga\": \"{{credencialDescarga}}\"\n}"
+              "raw": "{\n  \"credencialDescarga\": \"clave123\"\n}"
             }
           },
           "response": [],
@@ -257,7 +266,7 @@
             "description": "Actualiza contenido y vuelve a subir el mismo objeto a S3.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transportista\": \"{{transportista}}\",\n  \"credencialDescarga\": \"{{credencialDescarga}}\",\n  \"fecha\": \"{{fecha}}\",\n  \"contenido\": \"Pedido 1001 actualizado, destino Valparaiso, bultos 4. Evidencia de actualizacion en EFS y S3.\"\n}"
+              "raw": "{\n  \"transportista\": \"transportistaX\",\n  \"credencialDescarga\": \"clave123\",\n  \"fecha\": \"202606\",\n  \"contenido\": \"Pedido 1001 actualizado, destino Valparaiso, bultos 4. Evidencia de actualizacion en EFS y S3.\"\n}"
             }
           },
           "response": [],
@@ -282,7 +291,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/guias?transportista={{transportista}}&fecha={{fecha}}",
+              "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=202606",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -293,11 +302,11 @@
               "query": [
                 {
                   "key": "transportista",
-                  "value": "{{transportista}}"
+                  "value": "transportistaX"
                 },
                 {
                   "key": "fecha",
-                  "value": "{{fecha}}"
+                  "value": "202606"
                 }
               ]
             },
@@ -357,7 +366,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/guias?transportista={{transportista}}&fecha={{fecha}}",
+              "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=202606",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -368,11 +377,11 @@
               "query": [
                 {
                   "key": "transportista",
-                  "value": "{{transportista}}"
+                  "value": "transportistaX"
                 },
                 {
                   "key": "fecha",
-                  "value": "{{fecha}}"
+                  "value": "202606"
                 }
               ]
             },
@@ -421,7 +430,7 @@
             "description": "El backend exige fecha en formato YYYYMM.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transportista\": \"{{transportista}}\",\n  \"credencialDescarga\": \"{{credencialDescarga}}\",\n  \"fecha\": \"2026-06\",\n  \"contenido\": \"Solicitud con fecha invalida.\"\n}"
+              "raw": "{\n  \"transportista\": \"transportistaX\",\n  \"credencialDescarga\": \"clave123\",\n  \"fecha\": \"2026-06\",\n  \"contenido\": \"Solicitud con fecha invalida.\"\n}"
             }
           },
           "response": [],
@@ -444,7 +453,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/guias?transportista={{transportista}}&fecha=2026-06",
+              "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=2026-06",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -455,7 +464,7 @@
               "query": [
                 {
                   "key": "transportista",
-                  "value": "{{transportista}}"
+                  "value": "transportistaX"
                 },
                 {
                   "key": "fecha",

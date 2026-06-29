@@ -29,8 +29,8 @@ Luego crear una guia desde Postman y volver a mostrar que aparece bajo:
 
 Importar:
 
-- `docs/postman/Sumativa_Cloud_Native_Semana6_EC2.postman_collection.json`
-- `docs/postman/Sumativa_Cloud_Native_Semana6_EC2.postman_environment.json`
+- `docs/postman/Sumativa_Cloud_Native_Semana6_API_Gateway.postman_collection.json`
+- `docs/postman/Sumativa_Cloud_Native_Semana6_API_Gateway.postman_environment.json`
 
 El environment ya queda apuntando a:
 
