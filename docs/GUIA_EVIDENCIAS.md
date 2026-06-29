@@ -38,6 +38,14 @@ El environment ya queda apuntando a:
 http://100.55.186.145:8080
 ```
 
+Cuando API Gateway este listo, reemplazar `baseUrl` por el Invoke URL del stage, por ejemplo:
+
+```text
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod
+```
+
+La coleccion usa `Authorization: Bearer {{accessToken}}`. Pegar en `accessToken` un token emitido por Azure AD B2C antes de probar contra API Gateway.
+
 Ejecutar las solicitudes en orden. La coleccion guarda automaticamente `idGuia` y `s3Key`.
 
 ### Crear guia

@@ -509,6 +509,20 @@
     {
       "key": "s3Key",
       "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": "PEGAR_TOKEN_AZURE_B2C"
     }
-  ]
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  }
 }
