@@ -96,7 +96,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME || secrets.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET_NAME: ${{ secrets.APP_STORAGE_S3_BUCKET || secrets.AWS_S3_BUCKET_NAME || secrets.AWS_S3_BUCKET }}
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$USER_SERVER@$EC2_HOST" << EOF
             set -e
