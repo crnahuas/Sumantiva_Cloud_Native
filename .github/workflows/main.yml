@@ -76,7 +76,23 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
-      # Paso 9: Agregar llave SSH
+      # Paso 9: Verificar acceso al bucket S3 desde GitHub Actions
+      - name: Verify S3 bucket access
+        if: github.event_name != 'pull_request'
+        run: |
+          BUCKET="${{ secrets.APP_STORAGE_S3_BUCKET }}"
+          echo "Verificando acceso al bucket: $BUCKET"
+
+          aws s3api head-bucket --bucket "$BUCKET"
+
+          echo "Prueba de escritura desde GitHub Actions" > s3-test.txt
+          aws s3 cp s3-test.txt "s3://$BUCKET/actions-test/s3-test.txt"
+          aws s3 ls "s3://$BUCKET/actions-test/"
+          aws s3 rm "s3://$BUCKET/actions-test/s3-test.txt"
+
+          echo "Bucket S3 OK"
+
+      # Paso 10: Agregar llave SSH
       - name: Add SSH Key
         if: github.event_name != 'pull_request'
         run: |
@@ -84,7 +100,7 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Paso 10: Conectarse a EC2 y desplegar el contenedor
+      # Paso 11: Conectarse a EC2 y desplegar el contenedor
       - name: SSH commands to deploy
         if: github.event_name != 'pull_request'
         env:
