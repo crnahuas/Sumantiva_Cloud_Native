@@ -681,18 +681,18 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/guias/{{idGuia}}/descarga",
+              "raw": "{{baseUrl}}/api/guias/1/descarga",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "guias",
-                "{{idGuia}}",
+                "1",
                 "descarga"
               ]
             },
-            "description": "Valida que el endpoint de descarga queda reservado para DESCARGA_GUIAS.",
+            "description": "Valida que el endpoint de descarga queda reservado para DESCARGA_GUIAS. Se usa id 1 fijo porque la autorizacion debe rechazar con 403 antes de consultar si la guia existe.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"credencialDescarga\": \"clave123\"\n}"
