@@ -12,7 +12,7 @@
         "type": "text/javascript",
         "exec": [
           "if (!pm.environment.get('baseUrl')) {",
-          "  pm.environment.set('baseUrl', 'http://localhost:8080');",
+          "  pm.environment.set('baseUrl', 'http://100.55.186.145:8080');",
           "}",
           "if (!pm.environment.get('fecha')) {",
           "  pm.environment.set('fecha', '202606');",
@@ -552,7 +552,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "http://100.55.186.145:8080"
     },
     {
       "key": "transportista",
