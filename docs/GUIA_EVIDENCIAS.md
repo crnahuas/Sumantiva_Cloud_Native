@@ -35,13 +35,13 @@ Importar:
 El environment ya queda apuntando a:
 
 ```text
-http://100.55.186.145:8080
+https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com
 ```
 
 Cuando API Gateway este listo, reemplazar `baseUrl` por el Invoke URL del stage, por ejemplo:
 
 ```text
-https://xxxx.execute-api.us-east-1.amazonaws.com/prod
+https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com
 ```
 
 La coleccion usa `Authorization: Bearer {{accessToken}}`. Pegar en `accessToken` un token emitido por Azure AD B2C antes de probar contra API Gateway.

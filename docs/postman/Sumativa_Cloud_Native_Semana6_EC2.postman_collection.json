@@ -10,7 +10,7 @@
       "script": {
         "type": "text/javascript",
         "exec": [
-          "if (!pm.environment.get('baseUrl')) pm.environment.set('baseUrl', 'http://100.55.186.145:8080');",
+          "if (!pm.environment.get('baseUrl')) pm.environment.set('baseUrl', 'https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com');",
           "if (!pm.environment.get('fecha')) pm.environment.set('fecha', '202606');",
           "if (!pm.environment.get('transportista')) pm.environment.set('transportista', 'transportistaX');",
           "if (!pm.environment.get('credencialDescarga')) pm.environment.set('credencialDescarga', 'clave123');",
@@ -484,7 +484,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://100.55.186.145:8080"
+      "value": "https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com"
     },
     {
       "key": "transportista",
