@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "Sumativa Cloud Native - Solo Roles Azure AD B2C",
+    "description": "Coleccion aislada para validar autorizacion por roles. No usa auth global; cada request define o elimina Authorization explicitamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://bab3x5yn3m.execute-api.us-east-1.amazonaws.com"
+    },
+    {
+      "key": "gestorToken",
+      "value": "PEGAR_TOKEN_GESTOR_GUIAS"
+    },
+    {
+      "key": "descargaToken",
+      "value": "PEGAR_TOKEN_DESCARGA_GUIAS"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "00.1 Confirmar token DESCARGA_GUIAS pegado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const token = pm.collectionVariables.get('descargaToken') || '';",
+              "pm.test('descargaToken no esta vacio', function () { pm.expect(token).to.not.include('PEGAR_TOKEN'); pm.expect(token.length).to.be.above(50); });",
+              "const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+              "console.log(payload);",
+              "pm.test('Token contiene DESCARGA_GUIAS', function () { pm.expect(payload.extension_consultaRole).to.eql('DESCARGA_GUIAS'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://postman-echo.com/get",
+          "protocol": "https",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ]
+        }
+      }
+    },
+    {
+      "name": "00.2 Confirmar token GESTOR_GUIAS pegado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const token = pm.collectionVariables.get('gestorToken') || '';",
+              "pm.test('gestorToken no esta vacio', function () { pm.expect(token).to.not.include('PEGAR_TOKEN'); pm.expect(token.length).to.be.above(50); });",
+              "const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+              "console.log(payload);",
+              "pm.test('Token contiene GESTOR_GUIAS', function () { pm.expect(payload.extension_consultaRole).to.eql('GESTOR_GUIAS'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://postman-echo.com/get",
+          "protocol": "https",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03.1 DESCARGA_GUIAS no puede crear guia - debe dar 403",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('descargaToken') });",
+              "pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status esperado: 403', function () { pm.expect([403]).to.include(pm.response.code); });",
+              "console.log('HTTP status:', pm.response.code);",
+              "console.log('Response:', pm.response.text());"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/guias",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "guias"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transportista\": \"transportistaX\",\n  \"credencialDescarga\": \"clave123\",\n  \"fecha\": \"202606\",\n  \"contenido\": \"Prueba aislada: DESCARGA_GUIAS intenta crear guia.\"\n}"
+        },
+        "description": "Debe ser 403 porque DESCARGA_GUIAS solo puede usar /descarga."
+      }
+    },
+    {
+      "name": "03.2 GESTOR_GUIAS no puede descargar - debe dar 403",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('gestorToken') });",
+              "pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status esperado: 403', function () { pm.expect([403]).to.include(pm.response.code); });",
+              "console.log('HTTP status:', pm.response.code);",
+              "console.log('Response:', pm.response.text());"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/guias/1/descarga",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "guias",
+            "1",
+            "descarga"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credencialDescarga\": \"clave123\"\n}"
+        },
+        "description": "Debe ser 403 porque el endpoint de descarga queda reservado para DESCARGA_GUIAS."
+      }
+    },
+    {
+      "name": "03.3 Sin token no puede consultar - rechazo esperado",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.request.headers.remove('Authorization');",
+              "pm.request.headers.remove('Content-Type');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status esperado: 401, 403', function () { pm.expect([401, 403]).to.include(pm.response.code); });",
+              "console.log('HTTP status:', pm.response.code);",
+              "console.log('Response:', pm.response.text());"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=202606",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "guias"
+          ],
+          "query": [
+            {
+              "key": "transportista",
+              "value": "transportistaX"
+            },
+            {
+              "key": "fecha",
+              "value": "202606"
+            }
+          ]
+        },
+        "description": "Debe ser 401 o 403 segun responda API Gateway/Resource Server, pero nunca 200."
+      }
+    }
+  ]
+}
