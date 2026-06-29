@@ -448,7 +448,7 @@
           ]
         },
         {
-          "name": "02.2 Consultar con fecha invalida - debe fallar",
+          "name": "02.2 Consultar con fecha invalida - rechazo esperado",
           "request": {
             "method": "GET",
             "header": [],
@@ -472,7 +472,7 @@
                 }
               ]
             },
-            "description": "Caso negativo para evidenciar que una fecha mal escrita no pasa como consulta valida."
+            "description": "Caso negativo: se envia fecha=2026-06 para demostrar que el backend no acepta consultas fuera del formato YYYYMM. La respuesta esperada es un error, no una lista 200."
           },
           "response": [],
           "event": [
@@ -481,7 +481,12 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status de error', function () { pm.expect(pm.response.code).to.be.oneOf([400, 500]); });"
+                  "pm.test('La consulta invalida no devuelve 200', function () {",
+                  "  pm.expect(pm.response.code).to.not.eql(200);",
+                  "});",
+                  "pm.test('La respuesta es error de validacion o error controlado por el framework', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 422, 500]);",
+                  "});"
                 ]
               }
             }
