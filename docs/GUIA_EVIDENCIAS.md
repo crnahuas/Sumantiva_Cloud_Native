@@ -29,10 +29,16 @@ Luego crear una guia desde Postman y volver a mostrar que aparece bajo:
 
 Importar:
 
-- `docs/postman/Sumativa_Cloud_Native_Evidencias.postman_collection.json`
-- `docs/postman/Sumativa_Cloud_Native_Evidencias.postman_environment.json`
+- `docs/postman/Sumativa_Cloud_Native_Semana6_EC2.postman_collection.json`
+- `docs/postman/Sumativa_Cloud_Native_Semana6_EC2.postman_environment.json`
 
-En el environment, cambiar `baseUrl` a `http://EC2_PUBLIC_IP:8080` para capturar evidencias del despliegue real en EC2. Si se prueba localmente, dejar `http://localhost:8080`.
+El environment ya queda apuntando a:
+
+```text
+http://100.55.186.145:8080
+```
+
+Ejecutar las solicitudes en orden. La coleccion guarda automaticamente `idGuia` y `s3Key`.
 
 ### Crear guia
 
