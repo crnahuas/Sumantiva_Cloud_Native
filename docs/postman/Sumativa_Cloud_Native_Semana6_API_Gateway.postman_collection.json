@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Sumativa Cloud Native - Semana 6 API Gateway",
-    "description": "Coleccion ordenada para probar el flujo completo por API Gateway: EFS, S3, descarga con permiso, errores esperados y eliminacion.",
+    "description": "Coleccion ordenada para probar Semana 6 por API Gateway: roles Azure B2C, EFS, S3, descarga con permiso, errores esperados y eliminacion.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -23,6 +23,10 @@
           "    pm.environment.set(key, defaults[key]);",
           "  }",
           "  pm.collectionVariables.set(key, pm.environment.get(key) || defaults[key]);",
+          "});",
+          "['gestorToken', 'descargaToken'].forEach(function (key) {",
+          "  const value = pm.environment.get(key) || pm.collectionVariables.get(key);",
+          "  if (value) { pm.collectionVariables.set(key, value); }",
           "});"
         ]
       }
@@ -71,7 +75,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         }
       ]
     },
@@ -119,7 +133,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.2 Subir guia a S3",
@@ -155,7 +179,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.3 Descargar con clave incorrecta - debe dar 403",
@@ -197,7 +231,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{descargaToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.4 Descargar con clave correcta",
@@ -240,7 +284,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{descargaToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.5 Actualizar guia",
@@ -283,7 +337,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.6 Consultar por transportista y fecha",
@@ -325,7 +389,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.7 Eliminar guia",
@@ -358,7 +432,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "01.8 Confirmar que ya no aparece en consulta activa",
@@ -400,7 +484,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         }
       ]
     },
@@ -445,7 +539,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "02.2 Consultar con fecha invalida - rechazo esperado",
@@ -490,6 +594,164 @@
                 ]
               }
             }
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Validacion de roles Azure AD B2C",
+      "item": [
+        {
+          "name": "03.1 DESCARGA_GUIAS no puede crear guias - debe dar 403",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{descargaToken}}",
+                "type": "string"
+              }
+            ]
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guias"
+              ]
+            },
+            "description": "Valida que el rol DESCARGA_GUIAS queda limitado al endpoint de descarga y no puede administrar guias.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transportista\": \"transportistaX\",\n  \"credencialDescarga\": \"clave123\",\n  \"fecha\": \"202606\",\n  \"contenido\": \"Intento de creacion con rol de descarga.\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.2 GESTOR_GUIAS no puede descargar - debe dar 403",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{gestorToken}}",
+                "type": "string"
+              }
+            ]
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guias/{{idGuia}}/descarga",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guias",
+                "{{idGuia}}",
+                "descarga"
+              ]
+            },
+            "description": "Valida que el endpoint de descarga queda reservado para DESCARGA_GUIAS.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credencialDescarga\": \"clave123\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.3 Sin token no puede consultar - debe dar 401",
+          "auth": {
+            "type": "noauth"
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/guias?transportista=transportistaX&fecha=202606",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guias"
+              ],
+              "query": [
+                {
+                  "key": "transportista",
+                  "value": "transportistaX"
+                },
+                {
+                  "key": "fecha",
+                  "value": "202606"
+                }
+              ]
+            },
+            "description": "Valida que las llamadas sin token JWT se rechazan antes de llegar a la funcionalidad."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
           ]
         }
       ]
@@ -525,8 +787,12 @@
       "value": ""
     },
     {
-      "key": "accessToken",
-      "value": "PEGAR_TOKEN_AZURE_B2C"
+      "key": "gestorToken",
+      "value": "PEGAR_TOKEN_GESTOR_GUIAS"
+    },
+    {
+      "key": "descargaToken",
+      "value": "PEGAR_TOKEN_DESCARGA_GUIAS"
     }
   ],
   "auth": {
@@ -534,7 +800,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "{{accessToken}}",
+        "value": "{{gestorToken}}",
         "type": "string"
       }
     ]

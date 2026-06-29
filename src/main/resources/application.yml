@@ -6,6 +6,12 @@ debug: false
 spring:
   application:
     name: sumativa-cloud-native
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZURE_B2C_ISSUER_URI:https://duocucazure.b2clogin.com/tfp/f1ef6dd7-1653-4742-be87-71512d709704/b2c_1_duocdemoazure_registro_login/v2.0/}
+          jwk-set-uri: ${AZURE_B2C_JWKS_URI:https://duocucazure.b2clogin.com/duocucazure.onmicrosoft.com/b2c_1_duocdemoazure_registro_login/discovery/v2.0/keys}
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:${APP_DATA_PATH:./data}/sumativa-db}
     driver-class-name: org.h2.Driver
@@ -24,6 +30,8 @@ logging:
     root: INFO
 
 app:
+  security:
+    role-claim: ${AZURE_B2C_ROLE_CLAIM:extension_consultaRole}
   storage:
     efs-path: ${APP_STORAGE_EFS_PATH:/app/efs}
     s3-bucket: ${APP_STORAGE_S3_BUCKET:}
