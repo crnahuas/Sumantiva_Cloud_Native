@@ -1,0 +1,30 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+debug: false
+
+spring:
+  application:
+    name: sumativa-cloud-native
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:${APP_DATA_PATH:./data}/sumativa-db}
+    driver-class-name: org.h2.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+
+app:
+  storage:
+    efs-path: ${APP_STORAGE_EFS_PATH:/app/efs}
+    s3-bucket: ${APP_STORAGE_S3_BUCKET:}
+    s3-region: ${AWS_REGION:us-east-1}
